@@ -1,15 +1,17 @@
 {
   "name": "bun-websocket",
   "version": "1.0.50",
+  "module": "src/index.js",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
-  },
-  "devDependencies": {
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+    "onnxruntime-node": "^1.18.0",
+    "sharp": "^0.33.4",
+    "ws": "^8.17.0"
+  }
 }
