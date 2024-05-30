@@ -43,6 +43,7 @@
 
 const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo07";
+const char* WS_SERVER_URL = "192.168.26.57";
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
@@ -215,7 +216,7 @@ void setup() {
   Serial.println("");
   Serial.println("Connected to WiFi");
 	// server address, port and URL
-	webSocket.begin("192.168.26.3", 3000, "/");
+	webSocket.begin(WS_SERVER_URL, 3000, "/");
 
 	// event handler
 	webSocket.onEvent(webSocketEvent);

@@ -52,25 +52,39 @@ const server = http.createServer(async (req, res) => {
 // Create a WebSocket server
 const wss = new WebSocket.Server({ server });
 
+let espSocketClient;
+
 wss.on("connection", (ws, req) => {
   const isCam = req.headers["authorization"] ? true : false;
+  if (isCam) {
+    espSocketClient = ws;
+  }
+
   ws.data = { isCam };
 
   ws.on("message", async (message) => {
-    const buf = Buffer.from(message);
-    const boxes = await detect_objects_on_image(buf);
+    if (isCam) {
+      const buf = Buffer.from(message);
+      const boxes = await detect_objects_on_image(buf);
 
-    // Publishing the message to all subscribers
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN && client !== ws) {
-        client.send(
-          JSON.stringify({
-            image: `data:image/jpeg;base64,${buf.toString("base64")}`,
-            boxes,
-          })
-        );
+      // Publishing the message to all subscribers
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN && client !== ws) {
+          client.send(
+            JSON.stringify({
+              image: `data:image/jpeg;base64,${buf.toString("base64")}`,
+              boxes,
+            })
+          );
+        }
+      });
+    } else {
+      // not from esp32, from browser client ex
+      console.log(`[ACTION] ${message}`);
+      if (espSocketClient) {
+        ws.send(message);
       }
-    });
+    }
   });
 
   ws.on("open", () => {
