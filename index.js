@@ -65,8 +65,8 @@ wss.on("connection", (ws, req) => {
   ws.on("message", async (message) => {
     if (isCam) {
       const buf = Buffer.from(message);
-      const boxes = await detect_objects_on_image(buf);
-
+      //const boxes = await detect_objects_on_image(buf);
+      boxes = []
       // Publishing the message to all subscribers
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN && client !== ws) {
@@ -82,7 +82,7 @@ wss.on("connection", (ws, req) => {
       // not from esp32, from browser client ex
       console.log(`[ACTION] ${message}`);
       if (espSocketClient) {
-        ws.send(message);
+        espSocketClient.send(String(message));
       }
     }
   });
