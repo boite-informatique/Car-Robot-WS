@@ -2,6 +2,7 @@ const http = require("http");
 const WebSocket = require("ws");
 const fs = require("fs");
 const path = require("path");
+const { detect_objects_on_image } = require("./object_detection");
 
 // Create an HTTP server
 const server = http.createServer(async (req, res) => {

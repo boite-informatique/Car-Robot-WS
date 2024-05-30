@@ -4,6 +4,12 @@
  * @param buf Input image body
  * @returns Array of bounding boxes in format [[x1,y1,x2,y2,object_type,probability],..]
  */
+const sharp = require("sharp");
+const ort = require("onnxruntime-node");
+
+module.exports = {
+  detect_objects_on_image,
+};
 async function detect_objects_on_image(buf) {
   const [input, img_width, img_height] = await prepare_input(buf);
   const output = await run_model(input);

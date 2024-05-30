@@ -36,6 +36,13 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
+#define MOTOR_1_PIN_1    14
+#define MOTOR_1_PIN_2    15
+#define MOTOR_2_PIN_1    13
+#define MOTOR_2_PIN_2    12
+
+const char* WIFI_SSID = "cnx";
+const char* WIFI_PASSWORD = "niggdo07";
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
@@ -67,6 +74,7 @@ void send_photo() {
   esp_camera_fb_return(fb);
 }
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  char payloadStr[length + 1];
 
 	switch(type) {
 		case WStype_DISCONNECTED:
@@ -77,7 +85,57 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 			break;
 		case WStype_TEXT:
-			Serial.printf("[WSc] get text: %s\n", payload);
+
+			memcpy(payloadStr, payload, length);
+			payloadStr[length] = '\0';
+
+      if(!strcmp(payloadStr, "forward")) {
+        Serial.println("Forward");
+        digitalWrite(MOTOR_1_PIN_1, 1);
+        digitalWrite(MOTOR_1_PIN_2, 0);
+        digitalWrite(MOTOR_2_PIN_1, 1);
+        digitalWrite(MOTOR_2_PIN_2, 0);
+      }
+      else if(!strcmp(payloadStr, "left")) {
+        Serial.println("Left");
+        digitalWrite(MOTOR_1_PIN_1, 0);
+        digitalWrite(MOTOR_1_PIN_2, 1);
+        digitalWrite(MOTOR_2_PIN_1, 1);
+        digitalWrite(MOTOR_2_PIN_2, 0);
+      }
+      else if(!strcmp(payloadStr, "right")) {
+        Serial.println("Right");
+        digitalWrite(MOTOR_1_PIN_1, 1);
+        digitalWrite(MOTOR_1_PIN_2, 0);
+        digitalWrite(MOTOR_2_PIN_1, 0);
+        digitalWrite(MOTOR_2_PIN_2, 1);
+      }
+      else if(!strcmp(payloadStr, "backward")) {
+        Serial.println("Backward");
+        digitalWrite(MOTOR_1_PIN_1, 0);
+        digitalWrite(MOTOR_1_PIN_2, 1);
+        digitalWrite(MOTOR_2_PIN_1, 0);
+        digitalWrite(MOTOR_2_PIN_2, 1);
+      }
+      else if(!strcmp(payloadStr, "stop")) {
+        Serial.println("Stop");
+        digitalWrite(MOTOR_1_PIN_1, 0);
+        digitalWrite(MOTOR_1_PIN_2, 0);
+        digitalWrite(MOTOR_2_PIN_1, 0);
+        digitalWrite(MOTOR_2_PIN_2, 0);
+      }
+      else if(!strcmp(payloadStr, "servo0")) {
+        Serial.println("servo 0°");
+        // servo.write(0); 
+      } 
+      else if(!strcmp(payloadStr, "servo45")) {
+        Serial.println("servo 45°");
+        // servo.write(45); 
+      }
+      else if(!strcmp(payloadStr, "servo90")) {
+        Serial.println("servo 90°");
+        // servo.write(90); 
+      }
 
 			// send message to server
 			// webSocket.sendTXT("message here");
@@ -146,7 +204,7 @@ void setup() {
 
   /* camera end */
 
-	WiFiMulti.addAP("tplink m", "kadamiloudi");
+	WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
 	//WiFi.disconnect();
 	while(WiFiMulti.run() != WL_CONNECTED) {
@@ -157,7 +215,7 @@ void setup() {
   Serial.println("");
   Serial.println("Connected to WiFi");
 	// server address, port and URL
-	webSocket.begin("192.168.1.113", 3000, "/");
+	webSocket.begin("192.168.26.3", 3000, "/");
 
 	// event handler
 	webSocket.onEvent(webSocketEvent);

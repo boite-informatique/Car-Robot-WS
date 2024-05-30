@@ -17,7 +17,7 @@
     </style>
   </head>
   <body>
-    <canvas id="overlay" />
+    <canvas></canvas>
     <script>
       const socket = new WebSocket(window.location.href);
       socket.addEventListener("open", (event) => {});
@@ -25,8 +25,31 @@
       // Listen for messages
       socket.addEventListener("message", async (event) => {
         const data = JSON.parse(event.data);
-        document.getElementById("imgStream").src = data.image;
+        draw_image_and_boxes(data.image, data.boxes);
       });
+
+      function draw_image_and_boxes(file,boxes) {
+          const img = new Image()
+          img.src = file
+          img.onload = () => {
+              const canvas = document.querySelector("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img,0,0);
+              ctx.strokeStyle = "#00FF00";
+              ctx.lineWidth = 3;
+              ctx.font = "18px serif";
+              boxes.forEach(([x1,y1,x2,y2,label]) => {
+                  ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+                  ctx.fillStyle = "#00ff00";
+                  const width = ctx.measureText(label).width;
+                  ctx.fillRect(x1,y1,width+10,25);
+                  ctx.fillStyle = "#000000";
+                  ctx.fillText(label, x1, y1+18);
+              });
+          }
+      }
     </script>
   </body>
 </html>
