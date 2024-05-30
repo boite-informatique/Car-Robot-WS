@@ -88,8 +88,6 @@
               class="button"
               onmousedown="sendAction('servo0');"
               ontouchstart="sendAction('servo0');"
-              onmouseup="sendAction('stop');"
-              ontouchend="sendAction('stop');"
             >
               Servo 0°
             </button>
@@ -99,8 +97,6 @@
               class="button"
               onmousedown="sendAction('servo45');"
               ontouchstart="sendAction('servo45');"
-              onmouseup="sendAction('stop');"
-              ontouchend="sendAction('stop');"
             >
               Servo 45°
             </button>
@@ -110,8 +106,6 @@
               class="button"
               onmousedown="sendAction('servo90');"
               ontouchstart="sendAction('servo90');"
-              onmouseup="sendAction('stop');"
-              ontouchend="sendAction('stop');"
             >
               Servo 90°
             </button>
@@ -177,23 +171,49 @@
       function handleKeyboardShortcuts(event) {
         switch (event.key) {
           case "z":
+          case "ArrowUp":
             sendAction("forward");
             break;
           case "q":
+          case "ArrowLeft":
             sendAction("left");
             break;
           case "s":
+          case "ArrowDown":
             sendAction("backward");
             break;
           case "d":
+          case "ArrowRight":
             sendAction("right");
             break;
+          case "f":
+            sendAction("flashon");
+            break;
+
           default:
             // Optional: Handle other keys if necessary
             break;
         }
       }
-      function handleKeyboardStop(event) {}
+
+      const actionStrings = [
+        "z",
+        "q",
+        "s",
+        "d",
+        "ArrowUp",
+        "ArrowLeft",
+        "ArrowDown",
+        "ArrowRight",
+      ];
+
+      function handleKeyboardStop(event) {
+        if (event.key == "f") {
+          sendAction("flashoff");
+        } else if (actionStrings.includes(event.key)) {
+          sendAction("stop");
+        }
+      }
     </script>
   </body>
 </html>
