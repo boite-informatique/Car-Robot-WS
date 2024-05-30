@@ -175,17 +175,17 @@
       document.addEventListener("keyup", handleKeyboardStop);
 
       function handleKeyboardShortcuts(event) {
-        switch (event.keyCode) {
-          case 87: // W key
+        switch (event.key) {
+          case "z":
             sendAction("forward");
             break;
-          case 65: // A key
+          case "q":
             sendAction("left");
             break;
-          case 83: // S key
+          case "s":
             sendAction("backward");
             break;
-          case 68: // D key
+          case "d":
             sendAction("right");
             break;
           default:
