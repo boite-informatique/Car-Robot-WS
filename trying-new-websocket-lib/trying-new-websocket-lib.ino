@@ -41,6 +41,77 @@
 #define MOTOR_2_PIN_1    12
 #define MOTOR_2_PIN_2    13
 #define FLASH_PIN         4
+#define SERVO_PIN        16
+
+
+// CustomServo.ino
+
+#define MIN_PULSE_WIDTH       544     // minimum pulse width
+#define MAX_PULSE_WIDTH      2400     // maximum pulse width
+#define DEFAULT_PULSE_WIDTH  1500     // default pulse width
+
+class CustomServo {
+public:
+    CustomServo();
+    void attach(int pin);
+    void detach();
+    void write(int angle);
+    void writeMicroseconds(int pulseWidth);
+    int read();
+    int readMicroseconds();
+    bool attached();
+
+private:
+    int servoPin;
+    int pulseWidth;
+    bool isAttached;
+};
+
+CustomServo::CustomServo() : servoPin(-1), pulseWidth(DEFAULT_PULSE_WIDTH), isAttached(false) {}
+
+void CustomServo::attach(int pin) {
+    servoPin = pin;
+    pinMode(servoPin, OUTPUT);
+    isAttached = true;
+}
+
+void CustomServo::detach() {
+    isAttached = false;
+}
+
+void CustomServo::write(int angle) {
+    if (angle < 0) angle = 0;
+    if (angle > 180) angle = 180;
+    pulseWidth = map(angle, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+    writeMicroseconds(pulseWidth);
+}
+
+void CustomServo::writeMicroseconds(int pulseWidth) {
+    if (pulseWidth < MIN_PULSE_WIDTH) pulseWidth = MIN_PULSE_WIDTH;
+    if (pulseWidth > MAX_PULSE_WIDTH) pulseWidth = MAX_PULSE_WIDTH;
+    this->pulseWidth = pulseWidth;
+    if (isAttached) {
+        digitalWrite(servoPin, HIGH);
+        delayMicroseconds(pulseWidth);
+        digitalWrite(servoPin, LOW);
+    }
+}
+
+int CustomServo::read() {
+    return map(pulseWidth, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180);
+}
+
+int CustomServo::readMicroseconds() {
+    return pulseWidth;
+}
+
+bool CustomServo::attached() {
+    return isAttached;
+}
+
+/* servo lib end */
+
+
 
 const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo07";
@@ -48,6 +119,7 @@ const char* WS_SERVER_URL = "192.168.26.57";
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
+CustomServo myServo;
 
 void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
 	const uint8_t* src = (const uint8_t*) mem;
@@ -124,17 +196,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         digitalWrite(MOTOR_2_PIN_1, 0);
         digitalWrite(MOTOR_2_PIN_2, 0);
       }
-      else if(!strcmp(payloadStr, "servo0")) {
-        Serial.println("servo 0°");
-        // servo.write(0); 
+      else if(!strcmp(payloadStr, "servoleft")) {
+        Serial.println("servo left");
+        myServo.write(myServo.read() - 3); 
       } 
-      else if(!strcmp(payloadStr, "servo45")) {
-        Serial.println("servo 45°");
-        // servo.write(45); 
-      }
-      else if(!strcmp(payloadStr, "servo90")) {
-        Serial.println("servo 90°");
-        // servo.write(90); 
+      else if(!strcmp(payloadStr, "servoright")) {
+        Serial.println("servo right");
+        myServo.write(myServo.read() + 3); 
       } else if(!strcmp(payloadStr, "flashon")) {
         Serial.println("flash on°");
         digitalWrite(FLASH_PIN, HIGH);
@@ -170,6 +238,7 @@ void setup() {
   pinMode(MOTOR_2_PIN_1, OUTPUT);
   pinMode(MOTOR_2_PIN_2, OUTPUT);
   pinMode(FLASH_PIN, OUTPUT);
+  myServo.attach(SERVO_PIN);
 
 	Serial.begin(115200);
   Serial.flush();
