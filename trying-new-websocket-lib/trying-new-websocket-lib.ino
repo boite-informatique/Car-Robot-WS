@@ -38,8 +38,9 @@
 
 #define MOTOR_1_PIN_1    14
 #define MOTOR_1_PIN_2    15
-#define MOTOR_2_PIN_1    13
-#define MOTOR_2_PIN_2    12
+#define MOTOR_2_PIN_1    12
+#define MOTOR_2_PIN_2    13
+#define FLASH_PIN         4
 
 const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo07";
@@ -76,7 +77,6 @@ void send_photo() {
 }
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   char payloadStr[length + 1];
-
 	switch(type) {
 		case WStype_DISCONNECTED:
 			Serial.printf("[WSc] Disconnected!\n");
@@ -86,7 +86,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 			break;
 		case WStype_TEXT:
-
 			memcpy(payloadStr, payload, length);
 			payloadStr[length] = '\0';
 
@@ -136,6 +135,12 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       else if(!strcmp(payloadStr, "servo90")) {
         Serial.println("servo 90°");
         // servo.write(90); 
+      } else if(!strcmp(payloadStr, "flashon")) {
+        Serial.println("flash on°");
+        digitalWrite(FLASH_PIN, HIGH);
+      } else if(!strcmp(payloadStr, "flashoff")) {
+        Serial.println("flash off°");
+        digitalWrite(FLASH_PIN, LOW);
       }
 
 			// send message to server
@@ -159,7 +164,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 }
 
 void setup() {
-    WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
+  pinMode(MOTOR_1_PIN_1, OUTPUT);
+  pinMode(MOTOR_1_PIN_2, OUTPUT);
+  pinMode(MOTOR_2_PIN_1, OUTPUT);
+  pinMode(MOTOR_2_PIN_2, OUTPUT);
+  pinMode(FLASH_PIN, OUTPUT);
+
 	Serial.begin(115200);
   Serial.flush();
 
