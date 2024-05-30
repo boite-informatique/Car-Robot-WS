@@ -26,10 +26,10 @@
           <td colspan="3" align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('forward');"
-              ontouchstart="toggleCheckbox('forward');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('forward');"
+              ontouchstart="sendAction('forward');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Forward
             </button>
@@ -39,10 +39,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('left');"
-              ontouchstart="toggleCheckbox('left');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('left');"
+              ontouchstart="sendAction('left');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Left
             </button>
@@ -50,8 +50,8 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('stop');"
-              ontouchstart="toggleCheckbox('stop');"
+              onmousedown="sendAction('stop');"
+              ontouchstart="sendAction('stop');"
             >
               Stop
             </button>
@@ -59,10 +59,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('right');"
-              ontouchstart="toggleCheckbox('right');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('right');"
+              ontouchstart="sendAction('right');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Right
             </button>
@@ -72,10 +72,10 @@
           <td colspan="3" align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('backward');"
-              ontouchstart="toggleCheckbox('backward');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('backward');"
+              ontouchstart="sendAction('backward');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Backward
             </button>
@@ -86,10 +86,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('servo0');"
-              ontouchstart="toggleCheckbox('servo0');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('servo0');"
+              ontouchstart="sendAction('servo0');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Servo 0°
             </button>
@@ -97,10 +97,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('servo45');"
-              ontouchstart="toggleCheckbox('servo45');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('servo45');"
+              ontouchstart="sendAction('servo45');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Servo 45°
             </button>
@@ -108,10 +108,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('servo90');"
-              ontouchstart="toggleCheckbox('servo90');"
-              onmouseup="toggleCheckbox('stop');"
-              ontouchend="toggleCheckbox('stop');"
+              onmousedown="sendAction('servo90');"
+              ontouchstart="sendAction('servo90');"
+              onmouseup="sendAction('stop');"
+              ontouchend="sendAction('stop');"
             >
               Servo 90°
             </button>
@@ -121,10 +121,10 @@
           <td colspan="3" align="center">
             <button
               class="button"
-              onmousedown="toggleCheckbox('flashon');"
-              ontouchstart="toggleCheckbox('flashon');"
-              onmouseup="toggleCheckbox('flashoff');"
-              ontouchend="toggleCheckbox('flashoff');"
+              onmousedown="sendAction('flashon');"
+              ontouchstart="sendAction('flashon');"
+              onmouseup="sendAction('flashoff');"
+              ontouchend="sendAction('flashoff');"
             >
               Flash
             </button>
@@ -142,9 +142,11 @@
         draw_image_and_boxes(data.image, data.boxes);
       });
 
-      function toggleCheckbox(action) {
+      // send ws event to esp32
+      function sendAction(action) {
         socket.send(action);
       }
+
       function draw_image_and_boxes(file, boxes) {
         const img = new Image();
         img.src = file;
@@ -167,6 +169,34 @@
           });
         };
       }
+
+      // keyboard shortcuts
+      document.addEventListener("keydown", handleKeyboardShortcuts);
+      document.addEventListener("keyup", handleKeyboardStop);
+
+      function handleKeyboardShortcuts(event) {
+        switch (event.keyCode) {
+          case 87: // W key
+            sendAction("forward");
+            break;
+          case 65: // A key
+            sendAction("left");
+            break;
+          case 83: // S key
+            sendAction("backward");
+            break;
+          case 68: // D key
+            sendAction("right");
+            break;
+          default:
+            // Optional: Handle other keys if necessary
+            break;
+        }
+      }
+      function handleKeyboardShortcuts(event) {
+        sendAction("stop");
+      }
+      handle;
     </script>
   </body>
 </html>
