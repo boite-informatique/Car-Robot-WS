@@ -41,7 +41,7 @@
 #define MOTOR_2_PIN_1    12
 #define MOTOR_2_PIN_2    13
 #define FLASH_PIN         4
-#define SERVO_PIN        16
+#define SERVO_PIN         2
 
 
 // CustomServo.ino
@@ -71,7 +71,6 @@ CustomServo::CustomServo() : servoPin(-1), pulseWidth(DEFAULT_PULSE_WIDTH), isAt
 
 void CustomServo::attach(int pin) {
     servoPin = pin;
-    pinMode(servoPin, OUTPUT);
     isAttached = true;
 }
 
@@ -198,11 +197,11 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       }
       else if(!strcmp(payloadStr, "servoleft")) {
         Serial.println("servo left");
-        myServo.write(myServo.read() - 3); 
+        myServo.write(myServo.read() - 6); 
       } 
       else if(!strcmp(payloadStr, "servoright")) {
         Serial.println("servo right");
-        myServo.write(myServo.read() + 3); 
+        myServo.write(myServo.read() + 6); 
       } else if(!strcmp(payloadStr, "flashon")) {
         Serial.println("flash on°");
         digitalWrite(FLASH_PIN, HIGH);
@@ -238,6 +237,7 @@ void setup() {
   pinMode(MOTOR_2_PIN_1, OUTPUT);
   pinMode(MOTOR_2_PIN_2, OUTPUT);
   pinMode(FLASH_PIN, OUTPUT);
+  pinMode(SERVO_PIN, OUTPUT);
   myServo.attach(SERVO_PIN);
 
 	Serial.begin(115200);
@@ -284,6 +284,7 @@ void setup() {
   }
 
   /* camera end */
+
 
 	WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
