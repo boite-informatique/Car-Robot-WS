@@ -53,6 +53,19 @@ const server = http.createServer(async (req, res) => {
 const wss = new WebSocket.Server({ server });
 
 let espSocketClient;
+let objDetectionEnabled = false;
+
+let espActions = [
+  "forward",
+  "backward",
+  "left",
+  "right",
+  "flashon",
+  "flashoff",
+  "servoleft",
+  "servoright",
+];
+let serverActions = ["objdetectionOn", "objdetectionOff"];
 
 wss.on("connection", (ws, req) => {
   const isCam = req.headers["authorization"] ? true : false;
@@ -65,8 +78,9 @@ wss.on("connection", (ws, req) => {
   ws.on("message", async (message) => {
     if (isCam) {
       const buf = Buffer.from(message);
-      //const boxes = await detect_objects_on_image(buf);
-      boxes = []
+      const boxes = objDetectionEnabled
+        ? await detect_objects_on_image(buf)
+        : [];
       // Publishing the message to all subscribers
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN && client !== ws) {
@@ -81,8 +95,19 @@ wss.on("connection", (ws, req) => {
     } else {
       // not from esp32, from browser client ex
       console.log(`[ACTION] ${message}`);
-      if (espSocketClient) {
+      if (espSocketClient && espActions.includes(message)) {
         espSocketClient.send(String(message));
+      } else if (serverActions.includes(message)) {
+        switch (message) {
+          case "objdetectionOn":
+            objDetectionEnabled = true;
+            break;
+          case "objdetectionOff":
+            objDetectionEnabled = false;
+            break;
+          default:
+            break;
+        }
       }
     }
   });
