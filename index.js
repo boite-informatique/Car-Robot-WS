@@ -60,6 +60,7 @@ let espActions = [
   "backward",
   "left",
   "right",
+  "stop",
   "flashon",
   "flashoff",
   "servoleft",

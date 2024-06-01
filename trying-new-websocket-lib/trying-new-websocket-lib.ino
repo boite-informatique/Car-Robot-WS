@@ -116,6 +116,9 @@ const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo08";
 const char* WS_SERVER_URL = "192.168.32.2";
 
+unsigned long previousMillis = 0;
+const long interval = 100;
+
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
 CustomServo myServo;
@@ -312,5 +315,9 @@ void setup() {
 
 void loop() {
 	webSocket.loop();
-  send_photo();
+  unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        send_photo();  // Call send_photo() every 100 ms
+    }
 }
