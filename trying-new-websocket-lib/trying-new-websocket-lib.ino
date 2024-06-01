@@ -113,8 +113,8 @@ bool CustomServo::attached() {
 
 
 const char* WIFI_SSID = "cnx";
-const char* WIFI_PASSWORD = "niggdo07";
-const char* WS_SERVER_URL = "192.168.26.57";
+const char* WIFI_PASSWORD = "niggdo08";
+const char* WS_SERVER_URL = "192.168.32.2";
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;

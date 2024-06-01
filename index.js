@@ -94,11 +94,13 @@ wss.on("connection", (ws, req) => {
       });
     } else {
       // not from esp32, from browser client ex
-      console.log(`[ACTION] ${message}`);
-      if (espSocketClient && espActions.includes(message)) {
-        espSocketClient.send(String(message));
-      } else if (serverActions.includes(message)) {
-        switch (message) {
+      const action = String(message);
+      console.log(`[ACTION] ${action}`);
+
+      if (espSocketClient && espActions.includes(action)) {
+        espSocketClient.send(String(action));
+      } else if (serverActions.includes(action)) {
+        switch (action) {
           case "objdetectionOn":
             objDetectionEnabled = true;
             break;
