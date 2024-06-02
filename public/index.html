@@ -87,8 +87,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="sendAction('servoleft');"
-              ontouchstart="sendAction('servoleft');"
+              onmousedown="sendAction('servoleftOn');"
+              ontouchstart="sendAction('servoleftOn');"
+              onmouseup="sendAction('servoleftOff');"
+              ontouchend="sendAction('servoleftOff');"
             >
               Servo Left
             </button>
@@ -96,8 +98,10 @@
           <td align="center">
             <button
               class="button"
-              onmousedown="sendAction('servoright');"
-              ontouchstart="sendAction('servoright');"
+              onmousedown="sendAction('servorightOn');"
+              ontouchstart="sendAction('servorightOn');"
+              onmouseup="sendAction('servorightOff');"
+              ontouchend="sendAction('servorightOff');"
             >
               Servo right
             </button>

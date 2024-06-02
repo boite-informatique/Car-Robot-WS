@@ -116,8 +116,14 @@ const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo08";
 const char* WS_SERVER_URL = "192.168.32.2";
 
-unsigned long previousMillis = 0;
-const long interval = 100;
+unsigned long photoPreviousMillis = 0;
+const long photoInterval = 100;
+
+unsigned long servoLeftPreviousMillis = 0;
+unsigned long servoRightPreviousMillis = 0;
+const long servoInterval = 15;
+bool servoRight = false;
+bool servoLeft = false;
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
@@ -198,13 +204,26 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         digitalWrite(MOTOR_2_PIN_1, 0);
         digitalWrite(MOTOR_2_PIN_2, 0);
       }
-      else if(!strcmp(payloadStr, "servoleft")) {
+      else if(!strcmp(payloadStr, "servoleftOn")) {
         Serial.println("servo left");
-        myServo.write(myServo.read() - 6); 
+        // myServo.write(myServo.read() - 6); 
+        servoRight = false;
+        servoLeft = true;
       } 
-      else if(!strcmp(payloadStr, "servoright")) {
+      else if(!strcmp(payloadStr, "servorightOn")) {
         Serial.println("servo right");
-        myServo.write(myServo.read() + 6); 
+        // myServo.write(myServo.read() + 6);
+        servoLeft = false;
+        servoRight = true;
+      } else if(!strcmp(payloadStr, "servoleftOff")) {
+        Serial.println("servo left off");
+        // myServo.write(myServo.read() + 6); 
+        servoLeft = false;
+      }
+      else if(!strcmp(payloadStr, "servorightOff")) {
+        Serial.println("servo right off");
+        // myServo.write(myServo.read() + 6); 
+        servoRight = false;
       } else if(!strcmp(payloadStr, "flashon")) {
         Serial.println("flash on°");
         digitalWrite(FLASH_PIN, HIGH);
@@ -316,8 +335,18 @@ void setup() {
 void loop() {
 	webSocket.loop();
   unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
+    if (currentMillis - photoPreviousMillis >= photoInterval) {
+        photoPreviousMillis = currentMillis;
         send_photo();  // Call send_photo() every 100 ms
+    }
+
+    if (servoLeft && currentMillis - servoLeftPreviousMillis >= servoInterval) {
+        servoLeftPreviousMillis = currentMillis;
+        int current = myServo.read();
+        myServo.write(current - 3); 
+    } else if (servoRight && currentMillis - servoRightPreviousMillis >= servoInterval) {
+        servoRightPreviousMillis = currentMillis;
+        int current = myServo.read();
+        myServo.write(current + 3); 
     }
 }

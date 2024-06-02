@@ -63,9 +63,12 @@ let espActions = [
   "stop",
   "flashon",
   "flashoff",
-  "servoleft",
-  "servoright",
+  "servoleftOn",
+  "servorightOn",
+  "servoleftOff",
+  "servorightOff",
 ];
+
 let serverActions = ["objdetectionOn", "objdetectionOff"];
 
 wss.on("connection", (ws, req) => {
