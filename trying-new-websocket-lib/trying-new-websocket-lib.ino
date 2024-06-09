@@ -118,7 +118,7 @@ const char* WIFI_PASSWORD = "niggdo08";
 const char* WS_SERVER_URL = "34.175.196.57";
 
 unsigned long photoPreviousMillis = 0;
-const long photoInterval = 100;
+long photoInterval = 100;
 
 unsigned long servoPreviousMillis = 0;
 const long servoInterval = 15;
