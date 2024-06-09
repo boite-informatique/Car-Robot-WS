@@ -5,88 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
+      body {
+        background-color: aliceblue;
+      }
+      .title {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+      }
+
+      .ab1 {
+        border-radius: 50% 5% 5% 50%;
+        background-color: #28a745;
+      }
+
+      .ab2 {
+        border-radius: 5% 50% 50% 5%;
+        background-color: #dc3545;
+      }
+
+      .on-state {
+        background-color: #28a745;
+        color: #fff;
+      }
+
+      .off-state {
+        background-color: #dc3545;
+        color: #fff;
+      }
+
+      .button {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #333;
+        background-color: #444;
+        color: #fff;
+      }
+
+      .button:active {
+        background-color: #666;
+      }
+      .direction-button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin: 5px;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+      }
+
+      .action-button {
+        width: 100px;
+        height: 50px;
+        border-radius: 5%;
+
+        color: white;
+      }
+
+      .action-button svg {
+        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+        fill: white;
+      }
+
       div {
         display: flex;
         justify-content: center;
       }
+
       canvas {
         display: block;
         border: 1px solid black;
         margin-top: 10px;
         height: 480px;
       }
+
+      .container {
+        display: flex;
+        gap: 40px;
+      }
+
+      @media (min-width: 600px) {
+        .container {
+          gap: 200px;
+        }
+      }
     </style>
   </head>
   <body>
+    <div class="title">Detection Car</div>
     <div>
       <canvas></canvas>
     </div>
-    <div>
+    <div class="container">
       <table>
         <tr>
           <td colspan="3" align="center">
             <button
-              class="button"
+              class="direction-button button"
               onmousedown="sendAction('forward');"
               ontouchstart="sendAction('forward');"
               onmouseup="sendAction('stop');"
               ontouchend="sendAction('stop');"
             >
-              Forward
+              ↑
             </button>
           </td>
         </tr>
         <tr>
           <td align="center">
             <button
-              class="button"
+              class="direction-button button"
               onmousedown="sendAction('left');"
               ontouchstart="sendAction('left');"
               onmouseup="sendAction('stop');"
               ontouchend="sendAction('stop');"
             >
-              Left
+              ←
             </button>
           </td>
           <td align="center">
             <button
-              class="button"
+              class="direction-button button"
               onmousedown="sendAction('stop');"
               ontouchstart="sendAction('stop');"
             >
-              Stop
+              ⏸
             </button>
           </td>
           <td align="center">
             <button
-              class="button"
+              class="direction-button button"
               onmousedown="sendAction('right');"
               ontouchstart="sendAction('right');"
               onmouseup="sendAction('stop');"
               ontouchend="sendAction('stop');"
             >
-              Right
+              →
             </button>
           </td>
         </tr>
         <tr>
           <td colspan="3" align="center">
             <button
-              class="button"
+              class="direction-button button"
               onmousedown="sendAction('backward');"
               ontouchstart="sendAction('backward');"
               onmouseup="sendAction('stop');"
               ontouchend="sendAction('stop');"
             >
-              Backward
+              ↓
             </button>
           </td>
         </tr>
+      </table>
+      <!-- section2 -->
+      <table>
         <!-- servo -->
         <tr>
           <td align="center">
             <button
-              class="button"
+              class="action-button button"
+              onmousedown="sendAction('servo0');"
+              ontouchstart="sendAction('servo0');"
+            >
+              Servo 0
+            </button>
+          </td>
+          <td align="center">
+            <button
+              class="action-button button"
               onmousedown="sendAction('servo30');"
               ontouchstart="sendAction('servo30');"
             >
@@ -95,49 +187,98 @@
           </td>
           <td align="center">
             <button
-              class="button"
+              class="action-button button"
+              onmousedown="sendAction('servo60');"
+              ontouchstart="sendAction('servo60');"
+            >
+              Servo 60
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">
+            <button
+              class="action-button button"
+              onmousedown="sendAction('servo90');"
+              ontouchstart="sendAction('servo90');"
+            >
+              Servo 90
+            </button>
+          </td>
+          <td align="center">
+            <button
+              class="action-button button"
               onmousedown="sendAction('servo120');"
               ontouchstart="sendAction('servo120');"
             >
               Servo 120
             </button>
           </td>
+          <td align="center">
+            <button
+              class="action-button button"
+              onmousedown="sendAction('servo150');"
+              ontouchstart="sendAction('servo150');"
+            >
+              Servo 150
+            </button>
+          </td>
         </tr>
         <tr>
           <td colspan="3" align="center">
             <button
-              class="button"
+              class="action-button button"
+              onmousedown="sendAction('servo180');"
+              ontouchstart="sendAction('servo180');"
+            >
+              Servo 180
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="3" align="center">
+            <button
+              class="action-button button"
               onmousedown="sendAction('flashon');"
               ontouchstart="sendAction('flashon');"
               onmouseup="sendAction('flashoff');"
               ontouchend="sendAction('flashoff');"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M13 2L3 14h8v8l10-12h-8V2z" />
+              </svg>
               Flash
             </button>
           </td>
         </tr>
+
         <tr>
           <td align="center">
             <button
-              class="button"
-              onmousedown="sendAction('objdetectionOn');"
+              class="action-button button"
+              style="background-color: #28a745; border-color: #28a745"
+              onmousedown="sendAction('objdetectionOff');"
               ontouchstart="sendAction('objdetectionOn');"
             >
-              enable obj detection
+              Enable obj detection
             </button>
           </td>
+          <td></td>
           <td align="center">
             <button
-              class="button"
+              class="button action-button"
+              style="background-color: #dc3545; border-color: #dc3545"
               onmousedown="sendAction('objdetectionOff');"
               ontouchstart="sendAction('objdetectionOff');"
             >
-              disable obj detection
+              Disable obj detection
             </button>
           </td>
         </tr>
       </table>
     </div>
+
     <script>
       const socket = new WebSocket(window.location.href);
       socket.addEventListener("open", (event) => {});
@@ -201,9 +342,10 @@
           case "f":
             sendAction("flashon");
             break;
-
+          case " ":
+            sendAction("stop");
+            break;
           default:
-            // Optional: Handle other keys if necessary
             break;
         }
       }

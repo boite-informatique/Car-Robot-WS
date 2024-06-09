@@ -208,7 +208,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       else if(!strncmp(payloadStr, "servo", 5)) {
         Serial.println(payloadStr);
         int angle = atoi(payloadStr + 5);
-        Serial.println(angle);
         targetServoAngle = angle;
       } else if(!strcmp(payloadStr, "flashon")) {
         Serial.println("flash on°");
