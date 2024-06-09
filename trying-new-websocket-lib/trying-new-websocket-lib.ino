@@ -112,18 +112,19 @@ bool CustomServo::attached() {
 
 
 
-const char* WIFI_SSID = "cnx";
-const char* WIFI_PASSWORD = "niggdo08";
-const char* WS_SERVER_URL = "192.168.32.2";
+const char* WIFI_SSID = "tplink m";
+const char* WIFI_PASSWORD = "kadamiloudi";
+const char* WS_SERVER_URL = "192.168.1.121";
+// const char* WS_SERVER_URL = "34.175.196.57";
 
 unsigned long photoPreviousMillis = 0;
 const long photoInterval = 100;
 
-unsigned long servoLeftPreviousMillis = 0;
-unsigned long servoRightPreviousMillis = 0;
+unsigned long servoPreviousMillis = 0;
 const long servoInterval = 15;
-bool servoRight = false;
-bool servoLeft = false;
+long targetServoAngle = 90;
+const long servoChangeStep = 4;
+const long servoChangeErrorInterval = servoChangeStep + 1;
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
@@ -204,26 +205,11 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         digitalWrite(MOTOR_2_PIN_1, 0);
         digitalWrite(MOTOR_2_PIN_2, 0);
       }
-      else if(!strcmp(payloadStr, "servoleftOn")) {
-        Serial.println("servo left");
-        // myServo.write(myServo.read() - 6); 
-        servoRight = false;
-        servoLeft = true;
-      } 
-      else if(!strcmp(payloadStr, "servorightOn")) {
-        Serial.println("servo right");
-        // myServo.write(myServo.read() + 6);
-        servoLeft = false;
-        servoRight = true;
-      } else if(!strcmp(payloadStr, "servoleftOff")) {
-        Serial.println("servo left off");
-        // myServo.write(myServo.read() + 6); 
-        servoLeft = false;
-      }
-      else if(!strcmp(payloadStr, "servorightOff")) {
-        Serial.println("servo right off");
-        // myServo.write(myServo.read() + 6); 
-        servoRight = false;
+      else if(!strncmp(payloadStr, "servo", 5)) {
+        Serial.println(payloadStr);
+        int angle = atoi(payloadStr + 5);
+        Serial.println(angle);
+        targetServoAngle = angle;
       } else if(!strcmp(payloadStr, "flashon")) {
         Serial.println("flash on°");
         digitalWrite(FLASH_PIN, HIGH);
@@ -289,11 +275,11 @@ void setup() {
   config.pixel_format = PIXFORMAT_JPEG; 
   
   if(psramFound()){
-    config.frame_size = FRAMESIZE_UXGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
+    config.frame_size = FRAMESIZE_VGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
     config.jpeg_quality = 10;
     config.fb_count = 2;
   } else {
-    config.frame_size = FRAMESIZE_SVGA;
+    config.frame_size = FRAMESIZE_VGA;
     config.jpeg_quality = 12;
     config.fb_count = 1;
   }
@@ -335,18 +321,23 @@ void setup() {
 void loop() {
 	webSocket.loop();
   unsigned long currentMillis = millis();
+
+    int currentAngle = myServo.read();
+    if (currentMillis - servoPreviousMillis >= servoInterval) {
+        servoPreviousMillis = currentMillis;
+        if (abs(currentAngle - targetServoAngle) > servoChangeErrorInterval) {
+          Serial.print(currentAngle);
+          Serial.print(" ");
+          if (currentAngle > targetServoAngle) {
+            myServo.write(currentAngle - servoChangeStep); 
+          } else {
+            myServo.write(currentAngle + servoChangeStep); 
+          }
+        }
+    }
+
     if (currentMillis - photoPreviousMillis >= photoInterval) {
         photoPreviousMillis = currentMillis;
         send_photo();  // Call send_photo() every 100 ms
-    }
-
-    if (servoLeft && currentMillis - servoLeftPreviousMillis >= servoInterval) {
-        servoLeftPreviousMillis = currentMillis;
-        int current = myServo.read();
-        myServo.write(current - 3); 
-    } else if (servoRight && currentMillis - servoRightPreviousMillis >= servoInterval) {
-        servoRightPreviousMillis = currentMillis;
-        int current = myServo.read();
-        myServo.write(current + 3); 
     }
 }

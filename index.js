@@ -63,10 +63,7 @@ let espActions = [
   "stop",
   "flashon",
   "flashoff",
-  "servoleftOn",
-  "servorightOn",
-  "servoleftOff",
-  "servorightOff",
+  "servo",
 ];
 
 let serverActions = ["objdetectionOn", "objdetectionOff"];
@@ -96,12 +93,13 @@ wss.on("connection", (ws, req) => {
           );
         }
       });
+      // fs.writeFileSync("image.jpg", buf);
     } else {
       // not from esp32, from browser client ex
       const action = String(message);
       console.log(`[ACTION] ${action}`);
 
-      if (espSocketClient && espActions.includes(action)) {
+      if (espSocketClient && espActions.some((a) => action.startsWith(a))) {
         espSocketClient.send(String(action));
       } else if (serverActions.includes(action)) {
         switch (action) {
