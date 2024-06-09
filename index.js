@@ -3,6 +3,7 @@ const WebSocket = require("ws");
 const fs = require("fs");
 const path = require("path");
 const { detect_objects_on_image } = require("./object_detection");
+const sharp = require("sharp");
 
 // Create an HTTP server
 const server = http.createServer(async (req, res) => {
@@ -54,7 +55,7 @@ const wss = new WebSocket.Server({ server });
 
 let espSocketClient;
 let objDetectionEnabled = false;
-
+let rotationAngle = 0;
 let espActions = [
   "forward",
   "backward",
@@ -66,7 +67,7 @@ let espActions = [
   "servo",
 ];
 
-let serverActions = ["objdetectionOn", "objdetectionOff"];
+let serverActions = ["objdetectionOn", "objdetectionOff", "rotate"];
 
 wss.on("connection", (ws, req) => {
   const isCam = req.headers["authorization"] ? true : false;
@@ -78,7 +79,12 @@ wss.on("connection", (ws, req) => {
 
   ws.on("message", async (message) => {
     if (isCam) {
-      const buf = Buffer.from(message);
+      const originalBuf = Buffer.from(message);
+      const buf =
+        rotationAngle == 0
+          ? originalBuf
+          : await sharp(originalBuf).rotate(rotationAngle).toBuffer(); // rotated
+
       const boxes = objDetectionEnabled
         ? await detect_objects_on_image(buf)
         : [];
@@ -108,6 +114,10 @@ wss.on("connection", (ws, req) => {
             break;
           case "objdetectionOff":
             objDetectionEnabled = false;
+            break;
+          case "rotate":
+            rotationAngle = (rotationAngle + 90) % 360;
+            console.log(rotationAngle);
             break;
           default:
             break;
