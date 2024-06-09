@@ -65,6 +65,8 @@ let espActions = [
   "flashon",
   "flashoff",
   "servo",
+  "fps",
+  "resolution",
 ];
 
 let serverActions = ["objdetectionOn", "objdetectionOff", "rotate"];

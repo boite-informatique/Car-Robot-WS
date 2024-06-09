@@ -112,10 +112,10 @@ bool CustomServo::attached() {
 
 
 
-const char* WIFI_SSID = "tplink m";
-const char* WIFI_PASSWORD = "kadamiloudi";
-const char* WS_SERVER_URL = "192.168.1.121";
-// const char* WS_SERVER_URL = "34.175.196.57";
+const char* WIFI_SSID = "cnx";
+const char* WIFI_PASSWORD = "niggdo08";
+// const char* WS_SERVER_URL = "192.168.1.121";
+const char* WS_SERVER_URL = "34.175.196.57";
 
 unsigned long photoPreviousMillis = 0;
 const long photoInterval = 100;
@@ -210,11 +210,25 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         int angle = atoi(payloadStr + 5);
         targetServoAngle = angle;
       } else if(!strcmp(payloadStr, "flashon")) {
-        Serial.println("flash on°");
+        Serial.println("flash on");
         digitalWrite(FLASH_PIN, HIGH);
       } else if(!strcmp(payloadStr, "flashoff")) {
-        Serial.println("flash off°");
+        Serial.println("flash off");
         digitalWrite(FLASH_PIN, LOW);
+      } else if(!strcmp(payloadStr, "fps20")) {
+        Serial.println("fps 20");
+        photoInterval = 50;
+      } else if(!strcmp(payloadStr, "fps10")) {
+        Serial.println("flash 10");
+        photoInterval = 100;
+      } else if(!strcmp(payloadStr, "resolutionlow")) {
+        Serial.println("low resolution VGA");
+        sensor_t *s = esp_camera_sensor_get();
+        s->set_framesize(s, FRAMESIZE_VGA);
+      } else if(!strcmp(payloadStr, "resolutionhigh")) {
+        Serial.println("high resolution HD");
+        sensor_t *s = esp_camera_sensor_get();
+        s->set_framesize(s, FRAMESIZE_HD);
       }
 
 			// send message to server
@@ -292,7 +306,7 @@ void setup() {
 
   /* camera end */
 
-
+  
 	WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
 	//WiFi.disconnect();
