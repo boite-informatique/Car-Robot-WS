@@ -114,8 +114,8 @@ bool CustomServo::attached() {
 
 const char* WIFI_SSID = "cnx";
 const char* WIFI_PASSWORD = "niggdo08";
-// const char* WS_SERVER_URL = "192.168.1.121";
-const char* WS_SERVER_URL = "34.175.196.57";
+const char* WS_SERVER_URL = "192.168.15.2";
+// const char* WS_SERVER_URL = "34.175.196.57";
 
 unsigned long photoPreviousMillis = 0;
 long photoInterval = 100;
