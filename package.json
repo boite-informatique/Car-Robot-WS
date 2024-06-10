@@ -6,8 +6,8 @@
     "bun-types": "latest"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "dependencies": {
     "onnxruntime-node": "^1.18.0",

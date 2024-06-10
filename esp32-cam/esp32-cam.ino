@@ -1,10 +1,3 @@
-/*
- * WebSocketClient.ino
- *
- *  Created on: 24.05.2015
- *
- */
-
 #include <Arduino.h>
 
 #include <WiFi.h>
@@ -44,7 +37,7 @@
 #define SERVO_PIN         2
 
 
-// CustomServo.ino
+/* THIS IS CODE COPIED FROM SERVO LIB, I HAD TO MODIFY IT TO MAKE IT WORK WITH ESP32, THIS IS TEMP SOLUTION */
 
 #define MIN_PULSE_WIDTH       544     // minimum pulse width
 #define MAX_PULSE_WIDTH      2400     // maximum pulse width
@@ -108,41 +101,30 @@ bool CustomServo::attached() {
     return isAttached;
 }
 
-/* servo lib end */
+/* END OF SERVO LIB */
 
 
 
-const char* WIFI_SSID = "cnx";
-const char* WIFI_PASSWORD = "niggdo08";
+const char* WIFI_SSID = "ssid";
+const char* WIFI_PASSWORD = "password";
 const char* WS_SERVER_URL = "192.168.15.2";
-// const char* WS_SERVER_URL = "34.175.196.57";
 
+/* to limit fps */
 unsigned long photoPreviousMillis = 0;
 long photoInterval = 100;
 
+/* to move servo 2 degrees each 15ms */
 unsigned long servoPreviousMillis = 0;
 const long servoInterval = 15;
 long targetServoAngle = 90;
-const long servoChangeStep = 4;
+const long servoChangeStep = 2;
 const long servoChangeErrorInterval = servoChangeStep + 1;
 
 WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
 CustomServo myServo;
 
-void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
-	const uint8_t* src = (const uint8_t*) mem;
-	Serial.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
-	for(uint32_t i = 0; i < len; i++) {
-		if(i % cols == 0) {
-			Serial.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
-		}
-		Serial.printf("%02X ", *src);
-		src++;
-	}
-	Serial.printf("\n");
-}
-
+/* send image through ws communication */
 void send_photo() {
   if(!webSocket.isConnected())
     return;
@@ -156,6 +138,9 @@ void send_photo() {
   webSocket.sendBIN(fb->buf, fb->len);
   esp_camera_fb_return(fb);
 }
+
+
+/* handle all received ws events */
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   char payloadStr[length + 1];
 	switch(type) {
@@ -167,7 +152,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 			break;
 		case WStype_TEXT:
-			memcpy(payloadStr, payload, length);
+			memcpy(payloadStr, payload, length); // copy payload to string
 			payloadStr[length] = '\0';
 
       if(!strcmp(payloadStr, "forward")) {
@@ -230,17 +215,8 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         sensor_t *s = esp_camera_sensor_get();
         s->set_framesize(s, FRAMESIZE_HD);
       }
-
-			// send message to server
-			// webSocket.sendTXT("message here");
 			break;
 		case WStype_BIN:
-			Serial.printf("[WSc] get binary length: %u\n", length);
-			hexdump(payload, length);
-
-			// send data to server
-			// webSocket.sendBIN(payload, length);
-			break;
 		case WStype_ERROR:			
 		case WStype_FRAGMENT_TEXT_START:
 		case WStype_FRAGMENT_BIN_START:
@@ -288,7 +264,7 @@ void setup() {
   config.pixel_format = PIXFORMAT_JPEG; 
   
   if(psramFound()){
-    config.frame_size = FRAMESIZE_VGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
+    config.frame_size = FRAMESIZE_VGA; 
     config.jpeg_quality = 10;
     config.fb_count = 2;
   } else {
@@ -335,22 +311,24 @@ void loop() {
 	webSocket.loop();
   unsigned long currentMillis = millis();
 
-    int currentAngle = myServo.read();
-    if (currentMillis - servoPreviousMillis >= servoInterval) {
-        servoPreviousMillis = currentMillis;
-        if (abs(currentAngle - targetServoAngle) > servoChangeErrorInterval) {
-          Serial.print(currentAngle);
-          Serial.print(" ");
-          if (currentAngle > targetServoAngle) {
-            myServo.write(currentAngle - servoChangeStep); 
-          } else {
-            myServo.write(currentAngle + servoChangeStep); 
-          }
+  /* check if requested servo angle matches current angle, if not change with 2 degrees each 15ms by default */
+  int currentAngle = myServo.read();
+  if (currentMillis - servoPreviousMillis >= servoInterval) {
+      servoPreviousMillis = currentMillis;
+      if (abs(currentAngle - targetServoAngle) > servoChangeErrorInterval) {
+        Serial.print(currentAngle);
+        Serial.print(" ");
+        if (currentAngle > targetServoAngle) {
+          myServo.write(currentAngle - servoChangeStep); 
+        } else {
+          myServo.write(currentAngle + servoChangeStep); 
         }
-    }
+      }
+  }
 
-    if (currentMillis - photoPreviousMillis >= photoInterval) {
-        photoPreviousMillis = currentMillis;
-        send_photo();  // Call send_photo() every 100 ms
-    }
+  /* limit fps to 10/20 depending on photoInterval */
+  if (currentMillis - photoPreviousMillis >= photoInterval) {
+      photoPreviousMillis = currentMillis;
+      send_photo();  
+  }
 }
